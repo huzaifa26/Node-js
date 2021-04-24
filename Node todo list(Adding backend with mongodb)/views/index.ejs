@@ -4,19 +4,28 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Todo List</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+
+     
     <h1><%= date %></h1>
     <form action="/" method="POST">
         <input type="text" name="todo" id="" placeholder="New Item">
         <input type="submit" name="" id="">
     </form>
 
-    <% for(let i=0;i<items.length;i++){ %>
-        <ul>
-            <li><%= items.name %></li>
+    <% var initail=items.length-1; %>
+    <% for(let i=initail;i>0; --i){ %>  
+        <form action="/delete" method="POST">
+        <ul> 
+            <li>  
+                <input name="checkBox" onChange="this.form.submit()" value="<%= items[i]._id %>" type="checkbox"> 
+                <%= items[i].name %> 
+            </li>
         </ul>
-    <%}%>
+        </form>
+        <%}%>
 </body>
 </html>

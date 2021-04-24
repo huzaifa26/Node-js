@@ -1,44 +1,68 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
+// const { equal } = require('node:assert');
 const app = express();
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.static(__dirname + '/public'));
 
 mongoose.connect("mongodb://localhost:27017/todolistDB", {useNewUrlParser:true,useUnifiedTopology: true});
 
 const itemSchema={
-	name: String
+	name: String,
+	date: String
 };
 
 const Item=mongoose.model("Item",itemSchema);
 
+var d = new Date();
+var n = d.getFullYear();
+var m = d.getDate();
+var dbDate=m + " " + n;
+var ddate= dbDate.toString();
+
+
 app.get('/', function(req,res){
+	// console.log("database date: " + dbDate);
 
 	const array=["not included in days","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 	let date= new Date();
-	date=date.getDay();
-	date=array[date];
+	day=date.getDay();
+	day=array[day];
 
-	Item.find({},function(err, todoItems){
-		res.render('index', {date: date, items:todoItems});
-		console.log("namee:"+ todoItems.name);
-	});
+	Item.find({date:{$eq:ddate}},function(err, todoItems){
+		var itemss = todoItems;
+			res.render('index', {date: day, items:itemss});
+		// console.log("nameeeeeeee:"+ todoItems);
 
-	// res.render('index', {date: date});	
+	});	
 });
 
 
 app.post('/',function(req,res){
 	let newItem = req.body.todo;
-	console.log(newItem);
 
 	const item = new Item({
-		name: newItem
+		name: newItem,
+		date: dbDate
 	});
 	item.save();
 	res.redirect("/");	
+});
+
+app.post("/delete",(req,res)=>{
+	var user_id=req.body.checkBox;
+	Item.findByIdAndRemove(user_id, (err, docs) => {
+		if (err){
+			console.log(err);
+		}
+		else{
+			console.log("Removed User : ", docs);
+			res.redirect("/");
+		}
+	});
 });
 
 
